@@ -9,15 +9,6 @@ import (
 	"github.com/fogleman/gg"
 )
 
-/*
-const (
-	N          = 12 * 12
-	Scale      = 1
-	Background = "77C4D3"
-	Palette    = "70a80075ab007bb00080b30087b8008ebd0093bf009ac400a1c900a7cc00aed100b6d600bcd900c4de00cce300d2e600dbeb00e1ed00eaf200f3f700fafa00ffff05ffff12ffff1cffff29ffff36ffff42ffff4fffff5cffff66ffff73ffff80ffff8cffff99ffffa3ffffb0ffffbdffffc9ffffd6ffffe3ffffedfffffafcfcfcf7f7f7f5f5f5f0f0f0edededebebebe6e6e6e3e3e3dedededbdbdbd6d6d6d4d4d4cfcfcfccccccc7c7c7c4c4c4c2c2c2bdbdbdbababab5b5b5b3b3b3b3b3b3"
-)
-*/
-
 func ContourImage(ctx context.Context, im image.Image, n int, scale float64) (image.Image, error) {
 
 	m := contourmap.FromImage(im).Closed()
