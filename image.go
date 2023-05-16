@@ -9,6 +9,8 @@ import (
 	"github.com/fogleman/gg"
 )
 
+// ContourImageSVG generate contour data derived from 'im' and draws it to a new `image.Image` instances.
+// The scale and number of contours is adjusted relative to the 'scale' and 'n' values respectively.
 func ContourImage(ctx context.Context, im image.Image, n int, scale float64) (image.Image, error) {
 
 	m := contourmap.FromImage(im).Closed()

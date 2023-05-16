@@ -9,6 +9,8 @@ import (
 	"github.com/fogleman/contourmap"
 )
 
+// ContourImageSVG generate contour data derived from 'im' and writes to 'wr' as SVG data. The scale and number of contours
+// is adjusted relative to the 'scale' and 'n' values respectively.
 func ContourImageSVG(ctx context.Context, wr io.Writer, im image.Image, n int, scale float64) error {
 
 	m := contourmap.FromImage(im).Closed()

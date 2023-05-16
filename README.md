@@ -1,5 +1,7 @@
 # go-image-contour
 
+Opinionated Go package for working with the `fogleman/contourmap` package.
+
 ## See also
 
 * https://github.com/aaronland/go-image

@@ -10,6 +10,8 @@ import (
 	"github.com/aaronland/go-image/transform"
 )
 
+// ContourTransformation is a struct that implements the `Transformation` interface for
+// replacing the contents of an image with contours derived from its pixel values.
 type ContourTransformation struct {
 	transform.Transformation
 	n     int
@@ -21,6 +23,10 @@ func init() {
 	transform.RegisterTransformation(ctx, "contour", NewContourTransformation)
 }
 
+// NewContourWriter returns a new `ContourTransformation` instance configure by 'uri'
+// in the form of:
+//
+//	contour://?n={N}&scale={SCALE}
 func NewContourTransformation(ctx context.Context, uri string) (transform.Transformation, error) {
 
 	u, err := url.Parse(uri)
@@ -66,6 +72,7 @@ func NewContourTransformation(ctx context.Context, uri string) (transform.Transf
 	return tr, nil
 }
 
+// Transform will derive the contours of 'im' and draw them to a new `image.Image` instance.
 func (tr *ContourTransformation) Transform(ctx context.Context, im image.Image) (image.Image, error) {
 	return ContourImage(ctx, im, tr.n, tr.scale)
 }
