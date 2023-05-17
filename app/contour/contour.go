@@ -11,11 +11,13 @@ import (
 	"github.com/sfomuseum/go-flags/flagset"
 )
 
+// Run invokes the image contour-ing application using the default flags.
 func Run(ctx context.Context, logger *log.Logger) error {
 	fs := DefaultFlagSet()
 	return RunWithFlagSet(ctx, fs, logger)
 }
 
+// Run invokes the image contour-ing application using 'fs' to derive flag values.
 func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet, logger *log.Logger) error {
 
 	flagset.Parse(fs)

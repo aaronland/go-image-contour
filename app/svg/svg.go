@@ -25,13 +25,13 @@ type RunOptions struct {
 	Logger *log.Logger
 }
 
-// Run invokes the image transformation application using the default flags.
+// Run invokes the application to generate SVG derived from an image's contours using the default flags.
 func Run(ctx context.Context, logger *log.Logger) error {
 	fs := DefaultFlagSet()
 	return RunWithFlagSet(ctx, fs, logger)
 }
 
-// Run invokes the image transformation application using a custom `flag.FlagSet` instance.
+// Run invokes the application to generate SVG derived from an image's contours using a custom `flag.FlagSet` instance.
 func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet, logger *log.Logger) error {
 
 	flagset.Parse(fs)
@@ -47,7 +47,7 @@ func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet, logger *log.Logger) e
 	return RunWithOptions(ctx, opts, paths...)
 }
 
-// Run invokes the image transformation application configured using 'opts'.
+// Run invokes the application to generate SVG derived from an image's contours configured using 'opts'.
 func RunWithOptions(ctx context.Context, opts *RunOptions, paths ...string) error {
 
 	source_b, err := bucket.OpenBucket(ctx, opts.SourceURI)
