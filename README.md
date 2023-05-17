@@ -16,6 +16,8 @@ go build -mod vendor -ldflags="-s -w" -o bin/contour-svg cmd/contour-svg/main.go
 
 ### contour
 
+Generate contour data derived from an image and draws the results to a new image.
+
 ```
 $> ./bin/contour -h
   -n int
@@ -33,7 +35,7 @@ $> ./bin/contour -h
 For example:
 
 ```
-$>./bin/contour -n fixtures/tokyo.jpg
+$> ./bin/contour -n 3 fixtures/tokyo.jpg
 ```
 
 Will transform this:
@@ -45,6 +47,8 @@ In to this:
 ![](fixtures/tokyo-contour-3.jpg)
 
 ### contour-svg
+
+Generate contour data derived from an image and write the results as SVG path elements to a new file.
 
 ```
 $> ./bin/contour-svg  -h
