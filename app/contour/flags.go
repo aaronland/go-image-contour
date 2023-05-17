@@ -21,8 +21,8 @@ func DefaultFlagSet() *flag.FlagSet {
 
 	fs := flagset.NewFlagSet("contour")
 
-	fs.IntVar(&n, "n", 12, "")
-	fs.Float64Var(&scale, "scale", 1.0, "")
+	fs.IntVar(&n, "n", 12, "The number of iterations used to generate contours.")
+	fs.Float64Var(&scale, "scale", 1.0, "The scale of the final output relative to the input image.")
 
 	fs.StringVar(&source_uri, "source-uri", "file:///", "A valid gocloud.dev/blob.Bucket URI where images are read from.")
 	fs.StringVar(&target_uri, "target-uri", "file:///", "A valid gocloud.dev/blob.Bucket URI where images are written to.")
