@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	
-	gc_blob "gocloud.dev/blob"	
+
+	gc_blob "gocloud.dev/blob"
 )
 
 // OpenBucket is a local helper function to open a gocloud.dev/blob Bucket URI and ensuring
@@ -23,7 +23,7 @@ func OpenBucket(ctx context.Context, bucket_uri string) (*gc_blob.Bucket, error)
 
 		bucket_uri = fmt.Sprintf("file://%s", cwd)
 	}
-	
+
 	u, err := url.Parse(bucket_uri)
 
 	if err != nil {
