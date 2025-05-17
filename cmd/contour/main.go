@@ -4,18 +4,16 @@ import (
 	"context"
 	"log"
 
-	"github.com/aaronland/go-image-contour/app/contour"
-	_ "github.com/aaronland/go-image/common"
+	"github.com/aaronland/go-image-contour/v2/app/contour"
+	_ "github.com/aaronland/go-image/v2/common"
 )
 
 func main() {
 
 	ctx := context.Background()
-	logger := log.Default()
-
-	err := contour.Run(ctx, logger)
+	err := contour.Run(ctx)
 
 	if err != nil {
-		logger.Fatalf("Failed to contour images, %v", err)
+		log.Fatalf("Failed to contour images, %v", err)
 	}
 }

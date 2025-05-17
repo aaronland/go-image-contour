@@ -4,21 +4,21 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
 
-	_ "github.com/aaronland/go-image-contour"
-	"github.com/aaronland/go-image/app/transform"
+	_ "github.com/aaronland/go-image-contour/v2"
+	
+	"github.com/aaronland/go-image/v2/app/transform"
 	"github.com/sfomuseum/go-flags/flagset"
 )
 
 // Run invokes the image contour-ing application using the default flags.
-func Run(ctx context.Context, logger *log.Logger) error {
+func Run(ctx context.Context) error {
 	fs := DefaultFlagSet()
-	return RunWithFlagSet(ctx, fs, logger)
+	return RunWithFlagSet(ctx, fs)
 }
 
 // Run invokes the image contour-ing application using 'fs' to derive flag values.
-func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet, logger *log.Logger) error {
+func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet) error {
 
 	flagset.Parse(fs)
 
@@ -33,15 +33,15 @@ func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet, logger *log.Logger) e
 		transformation_uris = append(transformation_uris, e)
 	}
 
+	paths := fs.Args()
+	
 	opts := &transform.RunOptions{
 		TransformationURIs: transformation_uris,
 		ApplySuffix:        suffix,
 		SourceURI:          source_uri,
 		TargetURI:          target_uri,
-		Logger:             logger,
+		Paths: paths,
 	}
 
-	paths := fs.Args()
-
-	return transform.RunWithOptions(ctx, opts, paths...)
+	return transform.RunWithOptions(ctx, opts)
 }
