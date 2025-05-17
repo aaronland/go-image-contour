@@ -4,12 +4,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
 	"path/filepath"
 	"strings"
 
-	"github.com/aaronland/go-image-contour"
-	"github.com/aaronland/go-image/decode"
+	"github.com/aaronland/go-image-contour/v2"
+	"github.com/aaronland/go-image/v2/decode"
 	"github.com/aaronland/gocloud-blob/bucket"
 	"github.com/sfomuseum/go-flags/flagset"
 	"gocloud.dev/blob"
@@ -21,34 +20,34 @@ type RunOptions struct {
 	SourceURI string
 	// SourceURI is a `gocloud.dev/blob.Bucket` URI specifying the location where images are written to.
 	TargetURI string
-	// Logger is a `log.Logger` instance used for logging messages and feedback.
-	Logger *log.Logger
+	// One or more image URIs (paths) to process.
+	Paths []string
 }
 
 // Run invokes the application to generate SVG derived from an image's contours using the default flags.
-func Run(ctx context.Context, logger *log.Logger) error {
+func Run(ctx context.Context) error {
 	fs := DefaultFlagSet()
-	return RunWithFlagSet(ctx, fs, logger)
+	return RunWithFlagSet(ctx, fs)
 }
 
 // Run invokes the application to generate SVG derived from an image's contours using a custom `flag.FlagSet` instance.
-func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet, logger *log.Logger) error {
+func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet) error {
 
 	flagset.Parse(fs)
 
+	paths := fs.Args()
+	
 	opts := &RunOptions{
 		SourceURI: source_uri,
 		TargetURI: source_uri,
-		Logger:    logger,
+		Paths: paths,
 	}
 
-	paths := fs.Args()
-
-	return RunWithOptions(ctx, opts, paths...)
+	return RunWithOptions(ctx, opts)
 }
 
 // Run invokes the application to generate SVG derived from an image's contours configured using 'opts'.
-func RunWithOptions(ctx context.Context, opts *RunOptions, paths ...string) error {
+func RunWithOptions(ctx context.Context, opts *RunOptions) error {
 
 	source_b, err := bucket.OpenBucket(ctx, opts.SourceURI)
 
@@ -72,7 +71,7 @@ func RunWithOptions(ctx context.Context, opts *RunOptions, paths ...string) erro
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	for _, key := range paths {
+	for _, key := range opts.Paths {
 
 		go func(key string) {
 
@@ -86,7 +85,7 @@ func RunWithOptions(ctx context.Context, opts *RunOptions, paths ...string) erro
 		}(key)
 	}
 
-	remaining := len(paths)
+	remaining := len(opts.Paths)
 
 	for remaining > 0 {
 		select {
@@ -123,13 +122,7 @@ func deriveSVG(ctx context.Context, opts *RunOptions, source_b *blob.Bucket, tar
 
 	defer r.Close()
 
-	dec, err := decode.NewDecoder(ctx, key)
-
-	if err != nil {
-		return fmt.Errorf("Failed to create decoder for %s, %w", key, err)
-	}
-
-	im, _, err := dec.Decode(ctx, r)
+	im, _, _, err := decode.DecodeImage(ctx, r)
 
 	if err != nil {
 		return fmt.Errorf("Failed to decode %s, %v", key, err)

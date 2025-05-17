@@ -70,7 +70,6 @@ import (
 	"fmt"
 	"hash"
 	"io"
-	"io/ioutil"
 	"log"
 	"mime"
 	"net/http"
@@ -128,12 +127,11 @@ func (r *Reader) Read(p []byte) (int, error) {
 		// to (SeekEnd, 0) and use the return value to determine the size
 		// of the data, then Seek back to (SeekStart, 0).
 		saved := r.savedOffset
-		r.savedOffset = -1
 		if r.relativeOffset == saved {
 			// Nope! We're at the same place we left off.
+			r.savedOffset = -1
 		} else {
 			// Yep! We've changed the offset. Recreate the reader.
-			_ = r.r.Close()
 			length := r.baseLength
 			if length >= 0 {
 				length -= r.relativeOffset
@@ -142,11 +140,13 @@ func (r *Reader) Read(p []byte) (int, error) {
 					return 0, gcerr.Newf(gcerr.Internal, nil, "blob: invalid Seek (base length %d, relative offset %d)", r.baseLength, r.relativeOffset)
 				}
 			}
-			var err error
-			r.r, err = r.b.NewRangeReader(r.ctx, r.key, r.baseOffset+r.relativeOffset, length, r.dopts)
+			newR, err := r.b.NewRangeReader(r.ctx, r.key, r.baseOffset+r.relativeOffset, length, r.dopts)
 			if err != nil {
 				return 0, wrapError(r.b, err, r.key)
 			}
+			_ = r.r.Close()
+			r.savedOffset = -1
+			r.r = newR
 		}
 	}
 	n, err := r.r.Read(p)
@@ -226,7 +226,7 @@ func (r *Reader) Size() int64 {
 // See https://gocloud.dev/concepts/as/ for background information, the "As"
 // examples in this package for examples, and the driver package
 // documentation for the specific types supported for that driver.
-func (r *Reader) As(i interface{}) bool {
+func (r *Reader) As(i any) bool {
 	return r.r.As(i)
 }
 
@@ -339,14 +339,14 @@ type Attributes struct {
 	// ETag for the blob; see https://en.wikipedia.org/wiki/HTTP_ETag.
 	ETag string
 
-	asFunc func(interface{}) bool
+	asFunc func(any) bool
 }
 
 // As converts i to driver-specific types.
 // See https://gocloud.dev/concepts/as/ for background information, the "As"
 // examples in this package for examples, and the driver package
 // documentation for the specific types supported for that driver.
-func (a *Attributes) As(i interface{}) bool {
+func (a *Attributes) As(i any) bool {
 	if a.asFunc == nil {
 		return false
 	}
@@ -514,11 +514,16 @@ func (w *Writer) uploadAndClose(r io.Reader) (err error) {
 		// Shouldn't happen.
 		return gcerr.Newf(gcerr.Internal, nil, "blob: uploadAndClose must be the first write")
 	}
-	driverUploader, ok := w.w.(driver.Uploader)
-	if ok {
-		err = driverUploader.Upload(r)
-	} else {
+	// When ContentMD5 is being checked, we can't use Upload.
+	if len(w.contentMD5) > 0 {
 		_, err = w.ReadFrom(r)
+	} else {
+		driverUploader, ok := w.w.(driver.Uploader)
+		if ok {
+			err = driverUploader.Upload(r)
+		} else {
+			_, err = w.ReadFrom(r)
+		}
 	}
 	cerr := w.Close()
 	if err == nil && cerr != nil {
@@ -551,7 +556,7 @@ type ListOptions struct {
 	// the underlying service's list functionality.
 	// asFunc converts its argument to driver-specific types.
 	// See https://gocloud.dev/concepts/as/ for background information.
-	BeforeList func(asFunc func(interface{}) bool) error
+	BeforeList func(asFunc func(any) bool) error
 }
 
 // ListIterator iterates over List results.
@@ -618,14 +623,14 @@ type ListObject struct {
 	// Fields other than Key and IsDir will not be set if IsDir is true.
 	IsDir bool
 
-	asFunc func(interface{}) bool
+	asFunc func(any) bool
 }
 
 // As converts i to driver-specific types.
 // See https://gocloud.dev/concepts/as/ for background information, the "As"
 // examples in this package for examples, and the driver package
 // documentation for the specific types supported for that driver.
-func (o *ListObject) As(i interface{}) bool {
+func (o *ListObject) As(i any) bool {
 	if o.asFunc == nil {
 		return false
 	}
@@ -688,7 +693,8 @@ var NewBucket = newBucket
 // function; see the package documentation for details.
 func newBucket(b driver.Bucket) *Bucket {
 	return &Bucket{
-		b: b,
+		b:            b,
+		ioFSCallback: func() (context.Context, *ReaderOptions) { return context.Background(), nil },
 		tracer: &oc.Tracer{
 			Package:        pkgName,
 			Provider:       oc.ProviderName(b),
@@ -701,7 +707,7 @@ func newBucket(b driver.Bucket) *Bucket {
 // See https://gocloud.dev/concepts/as/ for background information, the "As"
 // examples in this package for examples, and the driver package
 // documentation for the specific types supported for that driver.
-func (b *Bucket) As(i interface{}) bool {
+func (b *Bucket) As(i any) bool {
 	if i == nil {
 		return false
 	}
@@ -712,7 +718,7 @@ func (b *Bucket) As(i interface{}) bool {
 // ErrorAs panics if i is nil or not a pointer.
 // ErrorAs returns false if err == nil.
 // See https://gocloud.dev/concepts/as/ for background information.
-func (b *Bucket) ErrorAs(err error, i interface{}) bool {
+func (b *Bucket) ErrorAs(err error, i any) bool {
 	return gcerr.ErrorAs(err, i, b.b.ErrorAs)
 }
 
@@ -731,7 +737,7 @@ func (b *Bucket) ReadAll(ctx context.Context, key string) (_ []byte, err error) 
 		return nil, err
 	}
 	defer r.Close()
-	return ioutil.ReadAll(r)
+	return io.ReadAll(r)
 }
 
 // Download writes the content of a blob into an io.Writer w.
@@ -1083,14 +1089,15 @@ func (b *Bucket) NewWriter(ctx context.Context, key string, opts *WriterOptions)
 		opts = &WriterOptions{}
 	}
 	dopts := &driver.WriterOptions{
-		CacheControl:       opts.CacheControl,
-		ContentDisposition: opts.ContentDisposition,
-		ContentEncoding:    opts.ContentEncoding,
-		ContentLanguage:    opts.ContentLanguage,
-		ContentMD5:         opts.ContentMD5,
-		BufferSize:         opts.BufferSize,
-		MaxConcurrency:     opts.MaxConcurrency,
-		BeforeWrite:        opts.BeforeWrite,
+		CacheControl:                opts.CacheControl,
+		ContentDisposition:          opts.ContentDisposition,
+		ContentEncoding:             opts.ContentEncoding,
+		ContentLanguage:             opts.ContentLanguage,
+		ContentMD5:                  opts.ContentMD5,
+		BufferSize:                  opts.BufferSize,
+		MaxConcurrency:              opts.MaxConcurrency,
+		BeforeWrite:                 opts.BeforeWrite,
+		DisableContentTypeDetection: opts.DisableContentTypeDetection,
 	}
 	if len(opts.Metadata) > 0 {
 		// Services are inconsistent, but at least some treat keys
@@ -1138,13 +1145,16 @@ func (b *Bucket) NewWriter(ctx context.Context, key string, opts *WriterOptions)
 		md5hash:          md5.New(),
 		statsTagMutators: []tag.Mutator{tag.Upsert(oc.ProviderKey, b.tracer.Provider)},
 	}
-	if opts.ContentType != "" {
-		t, p, err := mime.ParseMediaType(opts.ContentType)
-		if err != nil {
-			cancel()
-			return nil, err
+	if opts.ContentType != "" || opts.DisableContentTypeDetection {
+		var ct string
+		if opts.ContentType != "" {
+			t, p, err := mime.ParseMediaType(opts.ContentType)
+			if err != nil {
+				cancel()
+				return nil, err
+			}
+			ct = mime.FormatMediaType(t, p)
 		}
-		ct := mime.FormatMediaType(t, p)
 		dw, err := b.b.NewTypedWriter(ctx, key, ct, dopts)
 		if err != nil {
 			cancel()
@@ -1320,7 +1330,7 @@ type SignedURLOptions struct {
 	// the underlying service's sign functionality.
 	// asFunc converts its argument to driver-specific types.
 	// See https://gocloud.dev/concepts/as/ for background information.
-	BeforeSign func(asFunc func(interface{}) bool) error
+	BeforeSign func(asFunc func(any) bool) error
 }
 
 // ReaderOptions sets options for NewReader and NewRangeReader.
@@ -1334,7 +1344,7 @@ type ReaderOptions struct {
 	//
 	// asFunc converts its argument to driver-specific types.
 	// See https://gocloud.dev/concepts/as/ for background information.
-	BeforeRead func(asFunc func(interface{}) bool) error
+	BeforeRead func(asFunc func(any) bool) error
 }
 
 // WriterOptions sets options for NewWriter.
@@ -1379,8 +1389,17 @@ type WriterOptions struct {
 	// ContentType specifies the MIME type of the blob being written. If not set,
 	// it will be inferred from the content using the algorithm described at
 	// http://mimesniff.spec.whatwg.org/.
+	// Set DisableContentTypeDetection to true to disable the above and force
+	// the ContentType to stay empty.
 	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type
 	ContentType string
+
+	// When true, if ContentType is the empty string, it will stay the empty
+	// string rather than being inferred from the content.
+	// Note that while the blob will be written with an empty string ContentType,
+	// most providers will fill one in during reads, so don't expect an empty
+	// ContentType if you read the blob back.
+	DisableContentTypeDetection bool
 
 	// ContentMD5 is used as a message integrity check.
 	// If len(ContentMD5) > 0, the MD5 hash of the bytes written must match
@@ -1402,7 +1421,7 @@ type WriterOptions struct {
 	//
 	// asFunc converts its argument to driver-specific types.
 	// See https://gocloud.dev/concepts/as/ for background information.
-	BeforeWrite func(asFunc func(interface{}) bool) error
+	BeforeWrite func(asFunc func(any) bool) error
 }
 
 // CopyOptions sets options for Copy.
@@ -1412,7 +1431,7 @@ type CopyOptions struct {
 	//
 	// asFunc converts its argument to driver-specific types.
 	// See https://gocloud.dev/concepts/as/ for background information.
-	BeforeCopy func(asFunc func(interface{}) bool) error
+	BeforeCopy func(asFunc func(any) bool) error
 }
 
 // BucketURLOpener represents types that can open buckets based on a URL.

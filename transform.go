@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/aaronland/go-image/transform"
+	"github.com/aaronland/go-image/v2/transform"
 )
 
 // ContourTransformation is a struct that implements the `Transformation` interface for

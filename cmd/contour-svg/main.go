@@ -4,18 +4,16 @@ import (
 	"context"
 	"log"
 
-	"github.com/aaronland/go-image-contour/app/svg"
-	_ "github.com/aaronland/go-image/common"
+	"github.com/aaronland/go-image-contour/v2/app/svg"
+	_ "github.com/aaronland/go-image/v2/common"
 )
 
 func main() {
 
 	ctx := context.Background()
-	logger := log.Default()
-
-	err := svg.Run(ctx, logger)
+	err := svg.Run(ctx)
 
 	if err != nil {
-		logger.Fatalf("Failed to contour images, %v", err)
+		log.Fatalf("Failed to contour images, %v", err)
 	}
 }
