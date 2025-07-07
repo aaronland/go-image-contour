@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	_ "github.com/aaronland/go-image-contour/v2"
-	
+
 	"github.com/aaronland/go-image/v2/app/transform"
 	"github.com/sfomuseum/go-flags/flagset"
 )
@@ -34,13 +34,13 @@ func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet) error {
 	}
 
 	paths := fs.Args()
-	
+
 	opts := &transform.RunOptions{
 		TransformationURIs: transformation_uris,
 		ApplySuffix:        suffix,
 		SourceURI:          source_uri,
 		TargetURI:          target_uri,
-		Paths: paths,
+		Paths:              paths,
 	}
 
 	return transform.RunWithOptions(ctx, opts)

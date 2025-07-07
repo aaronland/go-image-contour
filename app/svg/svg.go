@@ -36,11 +36,11 @@ func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet) error {
 	flagset.Parse(fs)
 
 	paths := fs.Args()
-	
+
 	opts := &RunOptions{
 		SourceURI: source_uri,
 		TargetURI: source_uri,
-		Paths: paths,
+		Paths:     paths,
 	}
 
 	return RunWithOptions(ctx, opts)

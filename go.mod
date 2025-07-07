@@ -2,16 +2,14 @@ module github.com/aaronland/go-image-contour/v2
 
 go 1.24
 
-toolchain go1.24.3
-
 require (
-	github.com/aaronland/go-image/v2 v2.0.0
+	github.com/aaronland/go-image/v2 v2.1.2
 	github.com/aaronland/gocloud-blob v0.5.0
 	github.com/fogleman/colormap v0.0.0-20240324153029-3da9a245d155
 	github.com/fogleman/contourmap v0.0.0-20190814184649-9f61d36c4199
 	github.com/fogleman/gg v1.3.0
 	github.com/sfomuseum/go-flags v0.10.0
-	gocloud.dev v0.41.0
+	gocloud.dev v0.42.0
 )
 
 require (
@@ -31,7 +29,7 @@ require (
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
-	github.com/googleapis/gax-go/v2 v2.14.1 // indirect
+	github.com/googleapis/gax-go/v2 v2.14.2 // indirect
 	github.com/mandykoh/go-parallel v0.1.0 // indirect
 	github.com/mandykoh/prism v0.35.3 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
@@ -41,14 +39,14 @@ require (
 	github.com/whosonfirst/go-ioutil v1.0.2 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go4.org v0.0.0-20200411211856-f5505b9728dd // indirect
-	golang.org/x/image v0.18.0 // indirect
-	golang.org/x/net v0.39.0 // indirect
-	golang.org/x/sys v0.32.0 // indirect
-	golang.org/x/text v0.24.0 // indirect
+	golang.org/x/image v0.27.0 // indirect
+	golang.org/x/net v0.41.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/text v0.26.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
-	google.golang.org/api v0.228.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250324211829-b45e905df463 // indirect
-	google.golang.org/grpc v1.71.0 // indirect
+	google.golang.org/api v0.235.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250603155806-513f23925822 // indirect
+	google.golang.org/grpc v1.73.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
