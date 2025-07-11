@@ -1,7 +1,8 @@
 window.addEventListener("load", function load(event){
-
-    var upload_el = document.getElementById("upload");
-    var feedback_el = document.getElementById("feedback");
+    
+    const upload_el = document.getElementById("upload");
+    const feedback_el = document.getElementById("feedback");
+    const results_el = document.getElementById("results");    
     
     var image_btn = document.getElementById("image-button");
     var start_video_btn = document.getElementById("start-video");
@@ -19,6 +20,14 @@ window.addEventListener("load", function load(event){
 	    
 	    contour(im_b64, n).then((rsp) => {
 		console.log("OK", rsp);
+
+		results_el.innerHTML = "";
+		
+		const img = document.createElement("img");
+		img.setAttribute("style", "max-height:400px; max-width: 400px;");
+		img.setAttribute("src", "data:image/png;base64," + rsp);
+		results_el.appendChild(img);
+		
 	    }).catch((err) => {
 		console.log("SAD", err);
 	    });
