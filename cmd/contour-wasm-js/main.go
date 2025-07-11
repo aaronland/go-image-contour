@@ -10,10 +10,14 @@ import (
 
 func main() {
 
-	contour_func := wasm.ContourFunc()
+	contour_func := wasm.ContourImageFunc()
 	defer contour_func.Release()
 
+	contour_svg_func := wasm.ContourSVGFunc()
+	defer contour_svg_func.Release()
+	
 	js.Global().Set("contour", contour_func)
+	js.Global().Set("contour_svg", contour_svg_func)	
 
 	c := make(chan struct{}, 0)
 

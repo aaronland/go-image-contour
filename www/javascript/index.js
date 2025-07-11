@@ -13,6 +13,8 @@ window.addEventListener("load", function load(event){
     const video = document.getElementById("video");
 
     var video_b64;
+
+    const parser = new DOMParser();
     
     sfomuseum.golang.wasm.fetch("wasm/contour.wasm").then((rsp) => {
 
@@ -21,19 +23,33 @@ window.addEventListener("load", function load(event){
 	    results_el.innerHTML = "";
 
 	    console.debug("Start contour");
-	    
+
+	    contour_svg(im_b64, n).then((rsp) => {
+
+		console.debug("Contour as SVG successful", rsp);
+		
+		const doc = parser.parseFromString(rsp, "image/svg+xml");
+		results_el.appendChild(doc.documentElement);
+		
+	    }).catch((err) => {
+		console.error("Failed to contour as SVG", err);
+	    });
+
+	    /*
 	    contour(im_b64, n).then((rsp) => {
 
 		console.debug("Contour successful");
+		return;
 		
 		const img = document.createElement("img");
-		img.setAttribute("style", "max-height:400px; max-width: 400px;");
+		img.setAttribute("style", "max-height:400px; max-width: 400px;border:solid 1px blue;");
 		img.setAttribute("src", "data:image/png;base64," + rsp);
 		results_el.appendChild(img);
 
 	    }).catch((err) => {
 		console.error("Failed to contour image", err);
 	    });
+	     */
 	    
 	};
 	
