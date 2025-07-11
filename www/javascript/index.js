@@ -4,32 +4,35 @@ window.addEventListener("load", function load(event){
     const feedback_el = document.getElementById("feedback");
     const results_el = document.getElementById("results");    
     
-    var image_btn = document.getElementById("image-button");
-    var start_video_btn = document.getElementById("start-video");
-    var stop_video_btn = document.getElementById("stop-video");            
+    const image_btn = document.getElementById("image-button");
+    const start_video_btn = document.getElementById("start-video");
+    const stop_video_btn = document.getElementById("stop-video");
+    const contour_video_btn = document.getElementById("contour-video");                
 
+    const iterations_el = document.getElementById("iterations");
     const video = document.getElementById("video");
+
+    var video_b64;
     
     sfomuseum.golang.wasm.fetch("wasm/contour.wasm").then((rsp) => {
 
-	var contour_image = function(im_b64){
+	var contour_image = function(im_b64, n){
 
-	    console.log("DO THIS", im_b64);
+	    results_el.innerHTML = "";
 
-	    let n = 6;	// MAKE ME AN OPTION
+	    console.debug("Start contour");
 	    
 	    contour(im_b64, n).then((rsp) => {
-		console.log("OK", rsp);
 
-		results_el.innerHTML = "";
+		console.debug("Contour successful");
 		
 		const img = document.createElement("img");
 		img.setAttribute("style", "max-height:400px; max-width: 400px;");
 		img.setAttribute("src", "data:image/png;base64," + rsp);
 		results_el.appendChild(img);
-		
+
 	    }).catch((err) => {
-		console.log("SAD", err);
+		console.error("Failed to contour image", err);
 	    });
 	    
 	};
@@ -45,9 +48,7 @@ window.addEventListener("load", function load(event){
 		canvas.height = video.videoHeight;
 		
 		context.drawImage(video, 0, 0, canvas.width, canvas.height);
-		const im_b64 = canvas.toDataURL('image/jpeg');
-		
-		contour_image(im_b64.replace("data:image/jpeg;base64,", ""));		
+		video_b64 = canvas.toDataURL('image/png').replace("data:image/png;base64,", "");		
 	    }
 	    
 	    requestAnimationFrame(process_video_tick);
@@ -109,7 +110,10 @@ window.addEventListener("load", function load(event){
 		reader.onload = function(e) {
 		    const im_b64 = e.target.result;
 		    const prefix = "data:" + file.type + ";base64,";
-		    contour_image(im_b64.replace(prefix, ""));
+
+		    const iterations = iterations_el.valueAsNumber;
+		    
+		    contour_image(im_b64.replace(prefix, ""), iterations);
 		};
 
 		reader.readAsDataURL(file);
@@ -120,6 +124,13 @@ window.addEventListener("load", function load(event){
 
 	upload_el.onchange = function(){
 	    // flush contour image
+	};
+
+	contour_video_btn.onclick = function(){
+
+	    const iterations = iterations_el.valueAsNumber;
+	    contour_image(video_b64, iterations);		
+	    return false;
 	};
 	
 	image_btn.onclick = function(){
@@ -153,10 +164,12 @@ window.addEventListener("load", function load(event){
 		    });
 
 		    stop_video_btn.setAttribute("disabled", "disabled");
-		    start_video_btn.removeAttribute("disabled");		    
+		    start_video_btn.removeAttribute("disabled");
+		    contour_video_btn.removeAttribute("disabled");		    		    
 		};
 
-		start_video_btn.setAttribute("disabled", "disabled");		
+		start_video_btn.setAttribute("disabled", "disabled");
+		contour_video_btn.removeAttribute("disabled");				
 		stop_video_btn.removeAttribute("disabled");
 		
 		process_video(stream);

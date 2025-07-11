@@ -15,14 +15,29 @@
     <body>
 	<div class="container">
 	    <div class="row" id="feedback"></div>
+	    
 	    <div class="row grid">
 		<div id="media-sources">
 
+		    <div class="mb-3 form-floating-x">
+			<label class="iterations">Number of iterations</label>
+			<input type="range" min="1" max="12" id="iterations" name="iterations" class="form-control" steps="1" list="iterations-ticks" value="2" />
+			<datalist id="iterations-ticks">
+			    <option value="2"></option>
+			    <option value="4"></option>
+			    <option value="6"></option>
+			    <option value="8"></option>
+			    <option value="10"></option>
+			    <option value="12"></option>
+			</datalist>
+		    </div>
+		    
 		    <div id="video-source">
-			<h3>Extract colours from video feed</h3>
+			<h3>Contour from video feed</h3>
 			<video id="video"></video>
 			<button type="submit" id="start-video" class="btn btn-primary" disabled>Start video</button>
-			<button type="submit" id="stop-video" class="btn btn-primary" disabled>Stop video</button>					
+			<button type="submit" id="stop-video" class="btn btn-primary" disabled>Stop video</button>
+			<button type="submit" id="contour-video" class="btn btn-primary" disabled>Contour</button>								
 		    </div>
 		    
 		    <div id="image-source">
@@ -34,7 +49,7 @@
 				<div style="font-size:small; margin-bottom:.5rem;">
 				    Supported file types: <code>image/jpeg</code>, <code>image/png</code>, <code>image/gif</code>, <code>image/webp</code>
 				</div>
-				<button type="submit" id="image-button" class="btn btn-primary" disabled>Extract colours</button>
+				<button type="submit" id="image-button" class="btn btn-primary" disabled>Contour image</button>
 			    </div>
 			</form>
 		    </div>
