@@ -10,6 +10,7 @@ window.addEventListener("load", function load(event){
     const contour_video_btn = document.getElementById("contour-video");                
 
     const iterations_el = document.getElementById("iterations");
+    const iterations_count_el = document.getElementById("iterations-count");    
     const video = document.getElementById("video");
 
     const image_spinner = document.getElementById("contour-image-spinner-svg");
@@ -21,6 +22,13 @@ window.addEventListener("load", function load(event){
     
     sfomuseum.golang.wasm.fetch("wasm/contour.wasm").then((rsp) => {
 
+	iterations_el.onchange = function(e){
+	    const el = e.target;
+	    iterations_count_el.innerText = el.value;
+	};
+
+	iterations_count_el.innerText = iterations_el.value;
+	
 	var contour_image = function(im_b64, n){
 
 	    return new Promise((resolve, reject) => {
@@ -121,13 +129,16 @@ window.addEventListener("load", function load(event){
 		    const iterations = iterations_el.valueAsNumber;
 
 		    image_spinner.style.display = "inline-block";
-
+		    image_btn.setAttribute("disabled", "disabled");
+		    
 		    setTimeout(function(){
 			
 			contour_image(im_b64.replace(prefix, ""), iterations).then((rsp) => {
 			    image_spinner.style.display = "none";
+			    image_btn.removeAttribute("disabled");
 			}).catch((err) => {
 			    image_spinner.style.display = "none";
+			    image_btn.removeAttribute("disabled");			    
 			});
 			
 		    }, 10);
@@ -144,16 +155,20 @@ window.addEventListener("load", function load(event){
 	};
 
 	contour_video_btn.onclick = function(){
+	    
 	    const iterations = iterations_el.valueAsNumber;
 
 	    video_spinner.style.display = "inline-block";
-
+	    contour_video_btn.setAttribute("disbled", "disabled");
+	    
 	    setTimeout(function(){
 		
 		contour_image(video_b64, iterations).then((rsp) => {
 		    video_spinner.style.display = "none";
+		    contour_video_btn.removeAttribute("disabled");
 		}).catch((err) => {
 		    video_spinner.style.display = "none";
+		    contour_video_btn.removeAttribute("disabled");
 		});
 		
 	    }, 10);
