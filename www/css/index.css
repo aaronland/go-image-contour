@@ -18,12 +18,22 @@ body {
 
 /* Ids */
 
-#contour-spinner {
-        animation: rotate-ccw 5s linear infinite;
+#contour-image-spinner {
+        animation: rotate 5s linear infinite;
         transform-origin: center;
 }
 
-#contour-spinner-svg {
+#contour-image-spinner-svg {
+        display:none;
+        margin-left:.5rem;
+}
+
+#contour-video-spinner {
+        animation: rotate 5s linear infinite;
+        transform-origin: center;
+}
+
+#contour-video-spinner-svg {
         display:none;
         margin-left:.5rem;
 }

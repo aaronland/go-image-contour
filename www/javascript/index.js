@@ -12,6 +12,9 @@ window.addEventListener("load", function load(event){
     const iterations_el = document.getElementById("iterations");
     const video = document.getElementById("video");
 
+    const image_spinner = document.getElementById("contour-image-spinner-svg");
+    const video_spinner = document.getElementById("contour-video-spinner-svg");    
+    
     var video_b64;
 
     const parser = new DOMParser();
@@ -20,21 +23,26 @@ window.addEventListener("load", function load(event){
 
 	var contour_image = function(im_b64, n){
 
-	    results_el.innerHTML = "";
-
-	    console.debug("Start contour");
-
-	    contour_svg(im_b64, n).then((rsp) => {
-
-		console.debug("Contour as SVG successful", rsp);
+	    return new Promise((resolve, reject) => {
 		
-		const doc = parser.parseFromString(rsp, "image/svg+xml");
-		results_el.appendChild(doc.documentElement);
+		results_el.innerHTML = "";
+		console.debug("Start contour");
+
+		contour_svg(im_b64, n).then((rsp) => {
+		    
+		    console.debug("Contour as SVG successful", rsp);
+		    
+		    const doc = parser.parseFromString(rsp, "image/svg+xml");
+		    results_el.appendChild(doc.documentElement);
+
+		    resolve();
+		    
+		}).catch((err) => {
+		    console.error("Failed to contour as SVG", err);
+		    reject(err);
+		});
 		
-	    }).catch((err) => {
-		console.error("Failed to contour as SVG", err);
 	    });
-
 	};
 	
 	var process_video_tick = function(){
@@ -111,7 +119,18 @@ window.addEventListener("load", function load(event){
 		    const im_b64 = e.target.result;
 		    const prefix = "data:" + file.type + ";base64,";
 		    const iterations = iterations_el.valueAsNumber;
-		    contour_image(im_b64.replace(prefix, ""), iterations);
+
+		    image_spinner.style.display = "inline-block";
+
+		    setTimeout(function(){
+			
+			contour_image(im_b64.replace(prefix, ""), iterations).then((rsp) => {
+			    image_spinner.style.display = "none";
+			}).catch((err) => {
+			    image_spinner.style.display = "none";
+			});
+			
+		    }, 10);
 		};
 
 		reader.readAsDataURL(file);
@@ -126,7 +145,19 @@ window.addEventListener("load", function load(event){
 
 	contour_video_btn.onclick = function(){
 	    const iterations = iterations_el.valueAsNumber;
-	    contour_image(video_b64, iterations);		
+
+	    video_spinner.style.display = "inline-block";
+
+	    setTimeout(function(){
+		
+		contour_image(video_b64, iterations).then((rsp) => {
+		    video_spinner.style.display = "none";
+		}).catch((err) => {
+		    video_spinner.style.display = "none";
+		});
+		
+	    }, 10);
+	    
 	    return false;
 	};
 	
