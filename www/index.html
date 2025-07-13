@@ -21,7 +21,7 @@
 
 		    <div class="mb-3 form-floating-x">
 			<label class="iterations">Number of iterations</label>
-			<input type="range" min="1" max="12" id="iterations" name="iterations" class="form-control" steps="1" list="iterations-ticks" value="6" />
+			<input type="range" min="1" max="12" id="iterations" name="iterations" class="form-control-x" steps="1" list="iterations-ticks" value="6" />
 			<datalist id="iterations-ticks">
 			    <option value="2"></option>
 			    <option value="4"></option>
@@ -55,7 +55,10 @@
 		    </div>
 		
 		</div>
-		<div id="results">
+		<div id="results-wrapper">
+		    <!-- https://icons.getbootstrap.com/icons/arrow-clockwise/ -->
+		    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#666" class="bi bi-arrow-clockwise" viewBox="0 0 16 16" id="contour-spinner-svg"><g id="contour-spinner"><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/></g></svg>		    
+		    <div id="results"></div>
 		</div>
 	    </div>
 	</div>

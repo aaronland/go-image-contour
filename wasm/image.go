@@ -1,17 +1,16 @@
 //go:build wasmjs
+
 package wasm
 
 import (
-	"bytes"
 	"bufio"
+	"bytes"
 	"context"
-	"fmt"
-	"syscall/js"
 	"encoding/base64"
+	"fmt"
 	"image"
-	_ "image/jpeg"
-	_ "image/gif"	
 	"image/png"
+	"syscall/js"
 
 	"github.com/aaronland/go-image-contour/v2"
 )
@@ -23,11 +22,11 @@ func ContourImageFunc() js.Func {
 		im_b64 := args[0].String()
 		n := args[1].Int()
 		scale := 1.0
-		
+
 		handler := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 			ctx := context.Background()
-			
+
 			resolve := args[0]
 			reject := args[1]
 
@@ -45,7 +44,7 @@ func ContourImageFunc() js.Func {
 				reject.Invoke(fmt.Printf("Failed to decode image, %v\n", err))
 				return nil
 			}
-			
+
 			new_im, err := contour.ContourImage(ctx, im, n, scale)
 
 			if err != nil {
@@ -66,7 +65,7 @@ func ContourImageFunc() js.Func {
 			wr.Flush()
 
 			new_b64 := base64.StdEncoding.EncodeToString(buf.Bytes())
-			
+
 			resolve.Invoke(new_b64)
 			return nil
 		})
@@ -74,5 +73,5 @@ func ContourImageFunc() js.Func {
 		promiseConstructor := js.Global().Get("Promise")
 		return promiseConstructor.New(handler)
 	})
-	
+
 }

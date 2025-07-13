@@ -1,5 +1,15 @@
 /* Animations */
 
+@keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+}
+
+@keyframes rotate-ccw {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(-360deg); }
+}
+
 /* Elements */
 
 body {
@@ -7,6 +17,16 @@ body {
 }
 
 /* Ids */
+
+#contour-spinner {
+        animation: rotate-ccw 5s linear infinite;
+        transform-origin: center;
+}
+
+#contour-spinner-svg {
+        display:none;
+        margin-left:.5rem;
+}
 
 #example {
 	border: solid thin;

@@ -35,22 +35,6 @@ window.addEventListener("load", function load(event){
 		console.error("Failed to contour as SVG", err);
 	    });
 
-	    /*
-	    contour(im_b64, n).then((rsp) => {
-
-		console.debug("Contour successful");
-		return;
-		
-		const img = document.createElement("img");
-		img.setAttribute("style", "max-height:400px; max-width: 400px;border:solid 1px blue;");
-		img.setAttribute("src", "data:image/png;base64," + rsp);
-		results_el.appendChild(img);
-
-	    }).catch((err) => {
-		console.error("Failed to contour image", err);
-	    });
-	     */
-	    
 	};
 	
 	var process_video_tick = function(){
@@ -126,9 +110,7 @@ window.addEventListener("load", function load(event){
 		reader.onload = function(e) {
 		    const im_b64 = e.target.result;
 		    const prefix = "data:" + file.type + ";base64,";
-
 		    const iterations = iterations_el.valueAsNumber;
-		    
 		    contour_image(im_b64.replace(prefix, ""), iterations);
 		};
 
@@ -139,11 +121,10 @@ window.addEventListener("load", function load(event){
 	};
 
 	upload_el.onchange = function(){
-	    // flush contour image
+	    results_el.innerHTML = "";	    
 	};
 
 	contour_video_btn.onclick = function(){
-
 	    const iterations = iterations_el.valueAsNumber;
 	    contour_image(video_b64, iterations);		
 	    return false;

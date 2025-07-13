@@ -1,18 +1,16 @@
 //go:build wasmjs
+
 package wasm
 
 import (
-	"bytes"
 	"bufio"
+	"bytes"
 	"context"
-	"fmt"
-	"syscall/js"
 	"encoding/base64"
+	"fmt"
 	"image"
-	_ "image/jpeg"
-	_ "image/gif"	
-	_ "image/png"
-	
+	"syscall/js"
+
 	"github.com/aaronland/go-image-contour/v2"
 )
 
@@ -23,11 +21,11 @@ func ContourSVGFunc() js.Func {
 		im_b64 := args[0].String()
 		n := args[1].Int()
 		scale := 1.0
-		
+
 		handler := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 			ctx := context.Background()
-			
+
 			resolve := args[0]
 			reject := args[1]
 
@@ -48,7 +46,7 @@ func ContourSVGFunc() js.Func {
 
 			var buf bytes.Buffer
 			wr := bufio.NewWriter(&buf)
-			
+
 			err = contour.ContourImageSVG(ctx, wr, im, n, scale)
 
 			if err != nil {
@@ -65,5 +63,5 @@ func ContourSVGFunc() js.Func {
 		promiseConstructor := js.Global().Get("Promise")
 		return promiseConstructor.New(handler)
 	})
-	
+
 }
