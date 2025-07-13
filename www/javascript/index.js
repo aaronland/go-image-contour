@@ -29,7 +29,7 @@ window.addEventListener("load", function load(event){
 
 	iterations_count_el.innerText = iterations_el.value;
 	
-	var contour_image = function(im_b64, n){
+	var do_contour_image = function(im_b64, n){
 
 	    return new Promise((resolve, reject) => {
 		
@@ -46,6 +46,7 @@ window.addEventListener("load", function load(event){
 		    resolve();
 		    
 		}).catch((err) => {
+		    feedback_el.innerText = "Failed to contour image, " + err;
 		    console.error("Failed to contour as SVG", err);
 		    reject(err);
 		});
@@ -133,12 +134,14 @@ window.addEventListener("load", function load(event){
 		    
 		    setTimeout(function(){
 			
-			contour_image(im_b64.replace(prefix, ""), iterations).then((rsp) => {
+			do_contour_image(im_b64.replace(prefix, ""), iterations).then((rsp) => {
 			    image_spinner.style.display = "none";
 			    image_btn.removeAttribute("disabled");
 			}).catch((err) => {
 			    image_spinner.style.display = "none";
-			    image_btn.removeAttribute("disabled");			    
+			    image_btn.removeAttribute("disabled");
+
+			    feedback_el.innerText = "Failed to contour image, " + err;			    
 			});
 			
 		    }, 10);
@@ -163,12 +166,14 @@ window.addEventListener("load", function load(event){
 	    
 	    setTimeout(function(){
 		
-		contour_image(video_b64, iterations).then((rsp) => {
+		do_contour_image(video_b64, iterations).then((rsp) => {
 		    video_spinner.style.display = "none";
 		    contour_video_btn.removeAttribute("disabled");
 		}).catch((err) => {
 		    video_spinner.style.display = "none";
 		    contour_video_btn.removeAttribute("disabled");
+
+		    feedback_el.innerText = "Failed to contour still, " + err;		    
 		});
 		
 	    }, 10);
@@ -183,6 +188,7 @@ window.addEventListener("load", function load(event){
 	    try {
 		process_upload();
 	    } catch(err) {
+		feedback_el.innerText = "Failed to process upload, " + err;
 		console.error(err);
 	    }
 
