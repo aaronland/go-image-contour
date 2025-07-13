@@ -3,12 +3,15 @@ package decode
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"image"
 	"io"
 	"log/slog"
 
+	_ "golang.org/x/image/bmp"
 	_ "golang.org/x/image/tiff"
+	_ "golang.org/x/image/webp"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
@@ -52,13 +55,13 @@ func DecodeImageWithOptions(ctx context.Context, im_r io.ReadSeeker, opts *Decod
 
 	if err != nil {
 		// Check error here...
-		slog.Warn("Failed to decode image natively", "error", err)
+		slog.Debug("Failed to decode image natively", "error", err)
 	}
 
 	mtype := mimetype.Detect(im_body)
 
 	switch im_fmt {
-	case "gif":
+	case "gif", "webp", "bmp":
 		// pass
 	case "jpeg":
 
@@ -72,7 +75,7 @@ func DecodeImageWithOptions(ctx context.Context, im_r io.ReadSeeker, opts *Decod
 		jpg_ifd, _, err := mc.Exif()
 
 		if err != nil {
-			slog.Warn("Failed to derive EXIF", "error", err)
+			slog.Debug("Failed to derive EXIF", "error", err)
 		} else {
 			ifd = jpg_ifd
 		}
@@ -90,7 +93,7 @@ func DecodeImageWithOptions(ctx context.Context, im_r io.ReadSeeker, opts *Decod
 		png_ifd, _, err := mc.Exif()
 
 		if err != nil {
-			slog.Warn("Failed to derive EXIF", "error", err)
+			slog.Debug("Failed to derive EXIF", "error", err)
 		} else {
 			ifd = png_ifd
 		}
@@ -108,7 +111,7 @@ func DecodeImageWithOptions(ctx context.Context, im_r io.ReadSeeker, opts *Decod
 		tiff_ifd, _, err := mc.Exif()
 
 		if err != nil {
-			slog.Warn("Failed to derive EXIF", "error", err)
+			slog.Debug("Failed to derive EXIF", "error", err)
 		} else {
 			ifd = tiff_ifd
 		}
@@ -137,7 +140,7 @@ func DecodeImageWithOptions(ctx context.Context, im_r io.ReadSeeker, opts *Decod
 			heic_ifd, _, err := mc.Exif()
 
 			if err != nil {
-				slog.Warn("Failed to derive EXIF", "error", err)
+				slog.Debug("Failed to derive EXIF", "error", err)
 			} else {
 				ifd = heic_ifd
 			}
@@ -184,6 +187,11 @@ func rotateFromOrientation(ctx context.Context, im image.Image, mtype *mimetype.
 	results, err := ifd.FindTagWithName("Orientation")
 
 	if err != nil {
+
+		if errors.Is(err, exif.ErrTagNotFound) {
+			return false, im, nil
+		}
+
 		return false, nil, err
 	}
 
