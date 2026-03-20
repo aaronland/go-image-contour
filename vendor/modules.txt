@@ -1,4 +1,4 @@
-# github.com/aaronland/go-image/v2 v2.1.4
+# github.com/aaronland/go-image/v2 v2.1.5
 ## explicit; go 1.25.0
 github.com/aaronland/go-image/v2/app/transform
 github.com/aaronland/go-image/v2/colour
@@ -60,7 +60,7 @@ github.com/fogleman/contourmap
 # github.com/fogleman/gg v1.3.0
 ## explicit
 github.com/fogleman/gg
-# github.com/gabriel-vasile/mimetype v1.4.10
+# github.com/gabriel-vasile/mimetype v1.4.13
 ## explicit; go 1.21
 github.com/gabriel-vasile/mimetype
 github.com/gabriel-vasile/mimetype/internal/charset

@@ -3,7 +3,7 @@ module github.com/aaronland/go-image-contour/v2
 go 1.25.0
 
 require (
-	github.com/aaronland/go-image/v2 v2.1.4
+	github.com/aaronland/go-image/v2 v2.1.5
 	github.com/aaronland/gocloud v1.0.4
 	github.com/fogleman/colormap v0.0.0-20240324153029-3da9a245d155
 	github.com/fogleman/contourmap v0.0.0-20190814184649-9f61d36c4199
@@ -25,7 +25,7 @@ require (
 	github.com/dsoprea/go-png-image-structure/v2 v2.0.0-20210512210324-29b889a6093d // indirect
 	github.com/dsoprea/go-tiff-image-structure/v2 v2.0.0-20221003165014-8ecc4f52edca // indirect
 	github.com/dsoprea/go-utility/v2 v2.0.0-20221003172846-a3e1774ef349 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.10 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
