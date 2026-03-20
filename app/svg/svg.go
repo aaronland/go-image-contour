@@ -9,7 +9,7 @@ import (
 
 	"github.com/aaronland/go-image-contour/v2"
 	"github.com/aaronland/go-image/v2/decode"
-	"github.com/aaronland/gocloud-blob/bucket"
+	"github.com/aaronland/gocloud/blob/bucket"
 	"github.com/sfomuseum/go-flags/flagset"
 	"gocloud.dev/blob"
 )
