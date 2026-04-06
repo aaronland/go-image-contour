@@ -2,6 +2,10 @@
 
 Opinionated Go package for working with the `fogleman/contourmap` package.
 
+## Deprecation notice
+
+This package has been deprecated and will no longer be maintain. Its code and functionality have been merged with the [aaronland/go-image](https://github.com/aaronland/go-image) package.
+
 ## Documentation
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/aaronland/go-image-contour.svg)](https://pkg.go.dev/github.com/aaronland/go-image-contour)
